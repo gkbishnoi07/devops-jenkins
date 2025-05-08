@@ -18,18 +18,19 @@ pipeline {
                 checkout scm
                 echo 'Building the project...'
                 sh 'echo "Building the project..."'
+                // Example build command: npm install, mvn install, etc.
             }
         }
 
         stage('Test') {
             steps {
                 echo 'Running tests...'
-                sh 'echo "Running tests..."' // Replace with your actual test command (e.g., 'npm test', 'pytest', 'mvn test', etc.)
+                // Replace this with the actual test command that generates XML result files
+                sh 'echo "Running tests..."' // or 'npm test', 'pytest', 'mvn test', etc.
             }
             post {
                 always {
                     script {
-                        // Check if test result files exist before calling junit
                         def testResults = "${TEST_RESULTS_DIR}/**/*.xml"
                         if (fileExists(testResults)) {
                             junit testResults
@@ -44,6 +45,7 @@ pipeline {
         stage('Archive') {
             steps {
                 echo 'Archiving artifacts...'
+                // Ensure that the build and test-results directories are correctly populated
                 archiveArtifacts artifacts: "${BUILD_DIR}/**/*, ${TEST_RESULTS_DIR}/**/*", fingerprint: true
             }
         }
