@@ -18,18 +18,25 @@ pipeline {
                 checkout scm
                 echo 'Building the project...'
                 sh 'echo "Building the project..."'
-
             }
         }
 
         stage('Test') {
             steps {
                 echo 'Running tests...'
-                sh 'echo "Running tests..."' // or 'npm test', 'pytest', 'mvn test', etc.
+                sh 'echo "Running tests..."' // Replace with your actual test command (e.g., 'npm test', 'pytest', 'mvn test', etc.)
             }
             post {
                 always {
-                    junit "${TEST_RESULTS_DIR}/**/*.xml"
+                    script {
+                        // Check if test result files exist before calling junit
+                        def testResults = "${TEST_RESULTS_DIR}/**/*.xml"
+                        if (fileExists(testResults)) {
+                            junit testResults
+                        } else {
+                            echo 'No test result files found. Skipping JUnit report.'
+                        }
+                    }
                 }
             }
         }
