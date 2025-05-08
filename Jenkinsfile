@@ -1,68 +1,37 @@
 pipeline {
     agent any
-
     triggers {
-        cron('H 3 * * *') // Daily at 3 AM
+        cron('H 3 * * *')  // Trigger the build daily at 3 AM
     }
-
-    environment {
-        BUILD_DIR = 'build'
-        TEST_RESULTS_DIR = 'test-results'
-        RECIPIENTS = 'your-email@example.com'
-    }
-
     stages {
         stage('Checkout & Build') {
             steps {
-                echo 'Checking out code...'
-                checkout scm
-                echo 'Building the project...'
-                sh 'echo "Building the project..."'
-                // Example build command: npm install, mvn install, etc.
+                echo 'Checking out the repository and building the project...'
+                // Add your actual build command here
             }
         }
-
         stage('Test') {
             steps {
-                echo 'Running tests...'
-                // Replace this with the actual test command that generates XML result files
-                sh 'echo "Running tests..."' // or 'npm test', 'pytest', 'mvn test', etc.
-            }
-            post {
-                always {
-                    script {
-                        def testResults = "${TEST_RESULTS_DIR}/**/*.xml"
-                        if (fileExists(testResults)) {
-                            junit testResults
-                        } else {
-                            echo 'No test result files found. Skipping JUnit report.'
-                        }
-                    }
-                }
+                echo 'Running the full suite of tests...'
+                // Add your actual test command here
             }
         }
-
         stage('Archive') {
             steps {
-                echo 'Archiving artifacts...'
-                // Ensure that the build and test-results directories are correctly populated
-                archiveArtifacts artifacts: "${BUILD_DIR}/**/*, ${TEST_RESULTS_DIR}/**/*", fingerprint: true
+                echo 'Archiving build and test results...'
+                // Add archiving commands here if needed
             }
         }
-
         stage('Report') {
             steps {
-                script {
-                    def status = currentBuild.result ?: 'SUCCESS'
-                    emailext (
-                        to: "${RECIPIENTS}",
-                        subject: "Build #${env.BUILD_NUMBER} - ${status}",
-                        body: """<p>Build Status: ${status}</p>
-                                 <p>Check the build: ${env.BUILD_URL}</p>""",
-                        mimeType: 'text/html'
-                    )
-                }
+                echo 'Sending email with build result summary...'
+                // Add email sending command here
             }
+        }
+    }
+    post {
+        always {
+            echo 'Pipeline completed.'
         }
     }
 }
